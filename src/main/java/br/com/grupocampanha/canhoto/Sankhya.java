@@ -121,7 +121,7 @@ public class Sankhya {
 
    public static String importarCabecalho(Cabecalho cab){
        Node body = new Node("sql"){{try {
-           setValor("SELECT NUNOTA FROM TGFCAB cab left join TSIEMP emp on emp.codemp = cab.codemp WHERE emp.CGC = "+cab.getCnpj()+" and cab.numnota = "+cab.getNumeroDaNota()+" and cab.NUMALEATORIO = "+cab.getNunAletNota()+" AND CAB.TIPMOV = 'V'");
+           add("SELECT NUNOTA FROM TGFCAB cab left join TSIEMP emp on emp.codemp = cab.codemp WHERE emp.CGC = "+cab.getCnpj()+" and cab.numnota = "+cab.getNumeroDaNota()+" and cab.NUMALEATORIO = "+cab.getNunAletNota()+" AND CAB.TIPMOV = 'V'");
            
        } catch (InsertNodeValueException ex) {
                Logger.getLogger(Sankhya.class.getName()).log(Level.SEVERE, null, ex);
@@ -141,31 +141,31 @@ public class Sankhya {
                    entity.adicionarPropriedade("path", "");
                    Node fieldset = new Node("fieldset");
                    fieldset.adicionarPropriedade("list", "*");
-                    adicionarNode(entity);
-                   entity.adicionarNode(fieldset);
+                    add(entity);
+                   entity.add(fieldset);
                     Node dataRow = new Node("dataRow");
-                    adicionarNode(dataRow);
+                    add(dataRow);
                    Node localFields= new Node("localFields");
-                   dataRow.adicionarNode(localFields);
+                   dataRow.add(localFields);
                    Node DHOCOR = new Node("DHOCOR");
                    //"<![CDATA[" "]]>"
-                   DHOCOR.setValor(LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy 00:00")));
-                   localFields.adicionarNode(DHOCOR);
+                   DHOCOR.add(LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy 00:00")));
+                   localFields.add(DHOCOR);
                    Node HRACT = new Node("HRACT");
-                   HRACT.setValor(LocalTime.now().format(DateTimeFormatter.ofPattern("hhmmss")));
-                   localFields.adicionarNode(HRACT);
+                   HRACT.add(LocalTime.now().format(DateTimeFormatter.ofPattern("hhmmss")));
+                   localFields.add(HRACT);
                    Node digitado= new Node("DIGITADO");
-                   digitado.setValor("S");
-                   localFields.adicionarNode(digitado);
+                   digitado.add("S");
+                   localFields.add(digitado);
                    Node nunota2= new Node("NUNOTA");
-                   nunota2.setValor(nunota.getValor());
-                   localFields.adicionarNode(nunota2);
+                   nunota2.add(nunota.getValor());
+                   localFields.add(nunota2);
                    Node ocorrencias = new Node("OCORRENCIAS");
                       Node sequencia = new Node("SEQUENCIA");
-                      sequencia.setValor("0");
-                    ocorrencias.setValor("<![CDATA["+cab.getStatus()+"]]>");
-                    localFields.adicionarNode(ocorrencias);
-                    localFields.adicionarNode(sequencia);
+                      sequencia.add("0");
+                    ocorrencias.add("<![CDATA["+cab.getStatus()+"]]>");
+                    localFields.add(ocorrencias);
+                    localFields.add(sequencia);
                 }catch(Exception e){
                     e.printStackTrace();
                 }

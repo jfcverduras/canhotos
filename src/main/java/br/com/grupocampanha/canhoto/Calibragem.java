@@ -126,7 +126,7 @@ public class Calibragem extends javax.swing.JDialog {
             try {
             Document doc = XML.parse(new File("./Config.xml"));
             Node node = doc.node;
-            node.find(f -> f.getNome().equalsIgnoreCase("TempoLimite")).setValor(Float.toString(total));
+            node.find(f -> f.getNome().equalsIgnoreCase("TempoLimite")).add(Float.toString(total));
             doc.write(doc);
         } catch (Exception ex) {
             Logger.getLogger(Calibragem.class.getName()).log(Level.SEVERE, null, ex);
