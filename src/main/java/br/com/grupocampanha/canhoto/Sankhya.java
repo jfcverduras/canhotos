@@ -104,7 +104,7 @@ public class Sankhya {
             resposta = resposta.find(f -> f.getNome().equals(useJason ? "Resposta" : "serviceResponse"));
             
             if (!useJason && !resposta.getPropriedade("status").equals("1")) 
-                throw new Exception(new String( Base64.getDecoder().decode(XmlReader.cdataRemove( resposta.find(f -> f.getNome().equals("statusMessage")).getValue()))));
+                throw new Exception(new String( Base64.getDecoder().decode( resposta.find(f -> f.getNome().equals("statusMessage")).getValue().replace(" ",""))));
             
             return resposta;
 
