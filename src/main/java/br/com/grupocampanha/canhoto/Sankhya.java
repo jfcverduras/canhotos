@@ -52,9 +52,9 @@ public class Sankhya {
         HttpResponse resposta = cliente.execute(post);
         
         if (resposta.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-            Node node = XML.parse(EntityUtils.toString(resposta.getEntity())).node.find(f -> f.getNome().equals("serviceResponse"));
+            Node node = XML.parse(EntityUtils.toString(resposta.getEntity()),"temp").getRootNode().find(f -> f.getNome().equals("serviceResponse"));
             if (node.getPropriedade("status").equals("1")) {
-                SID = node.find(f -> f.getNome().equals("jsessionid")).getValor();
+                SID = node.find(f -> f.getNome().equals("jsessionid")).getValue();
                 String body = "<entity name=\"Usuario\" getPresentations=\"false\">\n"
                         + "<criterio nome=\"NOMEUSU\" valor=\"" + usuario.toUpperCase() + "\" />\n"
                         + "<fields>\n"
@@ -62,10 +62,10 @@ public class Sankhya {
                         + "	</fields>\n"
                         + "</entity>";
 
-                idusu= caller("mge", "crud.find", body, false).find(f -> f.getNome().equalsIgnoreCase("CODUSU")).getValor();
+                idusu= caller("mge", "crud.find", body, false).find(f -> f.getNome().equalsIgnoreCase("CODUSU")).getValue();
            
             } else {
-                byte[] erro = Base64.getDecoder().decode(XmlReader.cdataRemove(node.find(f -> f.getNome().equals("statusMessage")).getValor()));
+                byte[] erro = Base64.getDecoder().decode(XmlReader.cdataRemove(node.find(f -> f.getNome().equals("statusMessage")).getValue()));
                 throw new Exception(new String(erro));
             }
         } else {
@@ -94,17 +94,17 @@ public class Sankhya {
                 try {
                     stringResult = org.json.XML.toString(new org.json.JSONObject(stringResult));
                 } catch (Exception e) {
-                    resposta = XML.parse(stringResult).node;
-                    throw new Exception(new String(Base64.getDecoder().decode(XmlReader.cdataRemove(resposta.find(f -> f.getNome().equals("statusMessage")).getValor()))));
+                    resposta = XML.parse(stringResult,"temp").getRootNode();
+                    throw new Exception(new String(Base64.getDecoder().decode(XmlReader.cdataRemove(resposta.find(f -> f.getNome().equals("statusMessage")).getValue()))));
                 }
                 stringResult = "<Resposta>" + stringResult + "</Resposta>";
             }
             
-            resposta = XML.parse(stringResult).node;
+            resposta = XML.parse(stringResult,"temp").getRootNode();
             resposta = resposta.find(f -> f.getNome().equals(useJason ? "Resposta" : "serviceResponse"));
             
             if (!useJason && !resposta.getPropriedade("status").equals("1")) 
-                throw new Exception(new String( Base64.getDecoder().decode(XmlReader.cdataRemove( resposta.find(f -> f.getNome().equals("statusMessage")).getValor()))));
+                throw new Exception(new String( Base64.getDecoder().decode(XmlReader.cdataRemove( resposta.find(f -> f.getNome().equals("statusMessage")).getValue()))));
             
             return resposta;
 
@@ -158,7 +158,7 @@ public class Sankhya {
                    digitado.add("S");
                    localFields.add(digitado);
                    Node nunota2= new Node("NUNOTA");
-                   nunota2.add(nunota.getValor());
+                   nunota2.add(nunota.getValue());
                    localFields.add(nunota2);
                    Node ocorrencias = new Node("OCORRENCIAS");
                       Node sequencia = new Node("SEQUENCIA");

@@ -24,10 +24,12 @@ public class Calibragem extends javax.swing.JDialog {
     int progressbar = 0;
     float total = 0;
     List<Float> calibragens;
+    int count = 0;
+    Counter counter;
 
     public Calibragem() {
         this.setModal(true);
-
+        counter = new Counter(-1, 47);
         calibragens = new ArrayList();
         initComponents();
         jProgressBar1.setMaximum(10);
@@ -87,47 +89,55 @@ public class Calibragem extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void formKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_formKeyTyped
-        if (evt.getKeyChar() == '\n' || evt.getKeyChar() == '\r' || evt.getKeyCode() == evt.VK_ENTER)
+        if (evt.getKeyChar() == '\n' || evt.getKeyChar() == '\r' || evt.getKeyCode() == evt.VK_ENTER) {
             return;
-        palavra += evt.getKeyChar();
-        float tempo = TimerCali.tempo(palavra);
-        if (tempo != -1 && progressbar < 11) {
-            calibragens.add(tempo);
-              palavra = "";
-            System.out.println(tempo);
-             progressbar++;
-              jProgressBar1.setValue(progressbar);
-          if (progressbar == 10) {
-            makeCalibragem();
-            JOptionPane.showMessageDialog(this, "calibragem completa");
         }
+        if (counter.isStoped()) {
+            counter.init();
+            palavra = "";
+        }
+        palavra += evt.getKeyChar();
+        counter.count();
+
+        if (counter.isComplete() ) {
+            calibragens.add(counter.getCurrentTime());
+            palavra = "";
+            System.out.println(counter.getCurrentTime());
+            progressbar++;
+            jProgressBar1.setValue(progressbar);
+            counter.reset();
+            if (progressbar == 10) {
+                makeCalibragem();
+                JOptionPane.showMessageDialog(this, "calibragem completa");
+            }
+
         } 
-       
-       
-        
+
+
     }//GEN-LAST:event_formKeyTyped
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-      palavra = "";
-     progressbar = 0;
-     total = 0;
-    jProgressBar1.setValue(0);
+        palavra = "";
+        progressbar = 0;
+        total = 0;
+        jProgressBar1.setValue(0);
         calibragens = new ArrayList();
-        TimerCali.reset();
+        counter.reset();
         this.requestFocus();
     }//GEN-LAST:event_jButton1ActionPerformed
     private void makeCalibragem() {
 
         calibragens.forEach(i -> {
-            if(i> total)
-            total = i;
+            if (i > total) {
+                total = i;
+            }
         });
-        if(JOptionPane.showConfirmDialog(this, "O TOTAL FOI resultado foi" + total + " deseja salvar?","??",JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION)
+        if (JOptionPane.showConfirmDialog(this, "O TOTAL FOI resultado foi" + total + " deseja salvar?", "??", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION)
             try {
             Document doc = XML.parse(new File("./Config.xml"));
-            Node node = doc.node;
+            Node node = doc.getRootNode();
             node.find(f -> f.getNome().equalsIgnoreCase("TempoLimite")).add(Float.toString(total));
-            doc.write(doc);
+            doc.writeTo(new File("./Config.xml"));
         } catch (Exception ex) {
             Logger.getLogger(Calibragem.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -135,32 +145,8 @@ public class Calibragem extends javax.swing.JDialog {
     }
 
 
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JProgressBar jProgressBar1;
     // End of variables declaration//GEN-END:variables
-}
-
-class TimerCali {
-
-    private static long tempoInicial = 0;
-     static boolean primeiraEntrada = true;
-     public static void reset(){
-     primeiraEntrada = true;
-     tempoInicial = 0;
-     }
-    public static float tempo(String texto) {
-
-        if (primeiraEntrada) {
-            tempoInicial = System.currentTimeMillis();
-            primeiraEntrada = false;
-        }
-
-        if (texto.length() == 47) {
-            primeiraEntrada = true;
-            return (System.currentTimeMillis() - tempoInicial) / 1000f;
-        }
-        return -1;
-    }
 }

@@ -25,14 +25,17 @@ public class Principal extends javax.swing.JFrame {
     List<Cabecalho> cabecalhos;
     String texto;
     Opcoes opcoes;
+    Counter counter;
 
     public Principal() {
         cabecalhos = new ArrayList();
         opcoes = new Opcoes(this);
-        try{
-        Timer.setTempoLimite(Float.parseFloat(XML.parse(new File("./config.xml")).node.find(f->f.getNome().equalsIgnoreCase("TempoLimite")).getValor()));
-        }catch(Exception e){
-        JOptionPane.showConfirmDialog(this,e.getMessage());
+        try {
+            counter = new Counter(
+                    Float.parseFloat(XML.parse(new File("./Config.xml")).getRootNode().find(f -> f.getNome().equalsIgnoreCase("TempoLimite")).getValue()),
+                    47);
+        } catch (Exception e) {
+            JOptionPane.showConfirmDialog(this, e.getMessage());
         }
         texto = "";
 
@@ -148,34 +151,41 @@ public class Principal extends javax.swing.JFrame {
         }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-       
-        if (modeloTabela.getRowCount()>0 && JOptionPane.showConfirmDialog(this, "Deseja realmente importar", "importar?", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION)
+
+        if (modeloTabela.getRowCount() > 0 && JOptionPane.showConfirmDialog(this, "Deseja realmente importar", "importar?", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
             importar();
+        }
         jTable1.requestFocus();
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jTable1KeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTable1KeyTyped
-        if ((!evt.isActionKey() && (evt.getKeyChar() == '\n' || evt.getKeyChar() == '\r')) || evt.getKeyCode() == KeyEvent.VK_ESCAPE)
+        if ((!evt.isActionKey() && (evt.getKeyChar() == '\n' || evt.getKeyChar() == '\r')) || evt.getKeyCode() == KeyEvent.VK_ESCAPE) {
             return;
-        if (!Timer.isInTime()) {
-            System.out.println("false");
-            texto = "";
         }
 
-        if (texto.length() < 48) {
-            texto += evt.getKeyChar();
-            texto = texto.replace("\r", "").replace("\n", "");
-            evt.consume();
-            int result = Timer.isTextoValido(texto);
-            switch (result) {
-                case 1:
-                    processarCodigoDeBarras(texto);
-                    break;
-                case -1:
-                    texto = "";
-                    break;
-            }
+        if (counter.isStoped()) {
+            counter.reset();
+            counter.init();
+            texto = "";
         }
+        counter.count();
+        if (!counter.isInTime() && !counter.isComplete() && !counter.isStoped()) {
+            counter.reset();
+            texto = "";
+return;
+        }
+        texto += evt.getKeyChar();
+
+        
+        if (counter.isComplete() && counter.isInTime()) {
+            processarCodigoDeBarras(texto);
+            counter.reset();
+        } else if (!counter.isInTime()) {
+            counter.reset();
+            texto = "";
+        }
+System.out.println(counter.getCurrentTime() + " " + counter.getCount() + " " + texto);
+
     }//GEN-LAST:event_jTable1KeyTyped
 
     private void importar() {
@@ -184,21 +194,23 @@ public class Principal extends javax.swing.JFrame {
         int rowsCount = modeloTabela.getRowCount();
         jProgressBar1.setMaximum(rowsCount);
         int progressBar = 0;
-        for (int i = rowsCount -1; i >= 0; i--) {
+        for (int i = rowsCount - 1; i >= 0; i--) {
             Cabecalho cab = findCab(i);
             String retorno = Sankhya.importarCabecalho(cab);
             if (retorno.equals("ok")) {
                 modeloTabela.removeRow(i);
                 cabecalhos.remove(cab);
-            } else
+            } else {
                 modeloTabela.setValueAt(retorno, i, modeloTabela.findColumn("Status de importacao"));
+            }
 
             jProgressBar1.setValue(progressBar++);
         }
-        if (modeloTabela.getRowCount() > 0)
+        if (modeloTabela.getRowCount() > 0) {
             JOptionPane.showMessageDialog(this, "houve erro ao importar", "Erro", JOptionPane.ERROR_MESSAGE);
-        else
+        } else {
             JOptionPane.showMessageDialog(this, "Importacao finalizada", "SUCESSO", JOptionPane.INFORMATION_MESSAGE);
+        }
         jProgressBar1.setValue(0);
         jButton1.setEnabled(true);
         jButton2.setEnabled(true);
@@ -266,7 +278,7 @@ public class Principal extends javax.swing.JFrame {
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         deletarLinhas();
-                jTable1.requestFocus();
+        jTable1.requestFocus();
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void formKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_formKeyTyped
@@ -301,42 +313,4 @@ public class Principal extends javax.swing.JFrame {
     private javax.swing.JTable jTable1;
     private javax.swing.JPanel painelPrincipal;
     // End of variables declaration//GEN-END:variables
-}
-
-class Timer {
-
-    private static long tempoInicial = 0;
-    private static float tempoLimite = 0.46f;
-    private static boolean primeiraEntrada = true;
-
-    public static void setTempoLimite(float tempoLimite) {
-        Timer.tempoLimite = tempoLimite;
-    }
-
-    public static boolean isInTime() {
-        float tempo = (System.currentTimeMillis() - tempoInicial) / 1000f;;
-        if (tempo > tempoLimite) {
-            primeiraEntrada = true;
-            tempoInicial = 0;
-            return false;
-        }
-        return true;
-    }
-    
-    public static int isTextoValido(String texto) {
-
-        if (primeiraEntrada) {
-            tempoInicial = System.currentTimeMillis();
-            primeiraEntrada = false;
-        }
-
-        if (texto.length() == 47) {
-            if (!isInTime())
-                return -1;
-            primeiraEntrada = true;
-            tempoInicial = 0;
-            return 1;
-        }
-        return 0;
-    }
 }

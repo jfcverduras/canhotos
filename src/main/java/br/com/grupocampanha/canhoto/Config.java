@@ -16,7 +16,7 @@ class Config {
 
     static String getServerUrl() throws Exception {
         try {
-            return XML.parse(new File("./Config.xml")).node.find(f -> f.getNome().equalsIgnoreCase("serverURL")).getValor();
+            return XML.parse(new File("./Config.xml")).getRootNode().find(f -> f.getNome().equalsIgnoreCase("serverURL")).getValue();
         } catch (Exception e) {
             throw new Exception("FILE ./Config.xml nao existe ou node serverURL nao existe");
         }
