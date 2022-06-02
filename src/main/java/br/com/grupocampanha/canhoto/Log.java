@@ -4,7 +4,9 @@
  */
 package br.com.grupocampanha.canhoto;
 
+import com.sun.glass.events.KeyEvent;
 import java.awt.Dialog;
+import java.awt.event.KeyAdapter;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 
@@ -48,6 +50,12 @@ public class Log extends JDialog {
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
+            }
+        });
+
+        jPasswordField1.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                jPasswordField1KeyPressed(evt);
             }
         });
 
@@ -114,6 +122,11 @@ public class Log extends JDialog {
             JOptionPane.showMessageDialog(null, ex.getMessage(), "erro", JOptionPane.OK_OPTION);
         }
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jPasswordField1KeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jPasswordField1KeyPressed
+    if(evt.getKeyCode() == KeyEvent.VK_ENTER)
+        jButton1ActionPerformed(null);
+    }//GEN-LAST:event_jPasswordField1KeyPressed
 
     /**
      * @param args the command line arguments

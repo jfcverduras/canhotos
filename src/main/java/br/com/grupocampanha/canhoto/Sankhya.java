@@ -121,7 +121,7 @@ public class Sankhya {
 
    public static String importarCabecalho(Cabecalho cab){
        Node body = new Node("sql"){{try {
-           add("SELECT NUNOTA FROM TGFCAB cab left join TSIEMP emp on emp.codemp = cab.codemp WHERE emp.CGC = "+cab.getCnpj()+" and cab.numnota = "+cab.getNumeroDaNota()+" and cab.NUMALEATORIO = "+cab.getNunAletNota()+" AND CAB.TIPMOV = 'V'");
+           add("SELECT NUNOTA FROM TGFCAB cab left join TSIEMP emp on emp.codemp = cab.codemp WHERE emp.CGC = "+cab.getCnpj()+" and cab.numnota = "+cab.getNumeroDaNota()+" and cab.SERIENOTA = "+cab.getSerie()+" AND CAB.TIPMOV = 'V'");
            
        } catch (InsertNodeValueException ex) {
                Logger.getLogger(Sankhya.class.getName()).log(Level.SEVERE, null, ex);

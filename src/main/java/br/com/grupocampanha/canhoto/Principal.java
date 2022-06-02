@@ -33,7 +33,7 @@ public class Principal extends javax.swing.JFrame {
         try {
             counter = new Counter(
                     Float.parseFloat(XML.parse(new File("./Config.xml")).getRootNode().find(f -> f.getNome().equalsIgnoreCase("TempoLimite")).getValue()),
-                    47);
+                    44);
         } catch (Exception e) {
             JOptionPane.showConfirmDialog(this, e.getMessage());
         }
@@ -162,21 +162,17 @@ public class Principal extends javax.swing.JFrame {
         if ((!evt.isActionKey() && (evt.getKeyChar() == '\n' || evt.getKeyChar() == '\r')) || evt.getKeyCode() == KeyEvent.VK_ESCAPE) {
             return;
         }
-
-        if (counter.isStoped()) {
+        counter.count();
+        boolean reset = (!counter.isInTime() && !counter.isComplete() && !counter.isStoped());
+        if (counter.isStoped() || reset) {
             counter.reset();
             counter.init();
             texto = "";
+            counter.count();
         }
-        counter.count();
-        if (!counter.isInTime() && !counter.isComplete() && !counter.isStoped()) {
-            counter.reset();
-            texto = "";
-return;
-        }
+
         texto += evt.getKeyChar();
 
-        
         if (counter.isComplete() && counter.isInTime()) {
             processarCodigoDeBarras(texto);
             counter.reset();
@@ -184,7 +180,7 @@ return;
             counter.reset();
             texto = "";
         }
-System.out.println(counter.getCurrentTime() + " " + counter.getCount() + " " + texto);
+        System.out.println(counter.getCurrentTime() + " " + counter.getCount() + " " + texto);
 
     }//GEN-LAST:event_jTable1KeyTyped
 

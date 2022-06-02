@@ -29,7 +29,7 @@ public class Calibragem extends javax.swing.JDialog {
 
     public Calibragem() {
         this.setModal(true);
-        counter = new Counter(-1, 47);
+        counter = new Counter(-1, 44);
         calibragens = new ArrayList();
         initComponents();
         jProgressBar1.setMaximum(10);

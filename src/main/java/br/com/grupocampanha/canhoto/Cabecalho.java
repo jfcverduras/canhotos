@@ -14,15 +14,16 @@ public class Cabecalho {
     private String nunAletNota;
     private String status;
     private String cnpj;
-    
+    private String serie;
     public Cabecalho(String codigoDeBarras) {
         parse(codigoDeBarras);
     }
     
     private void parse(String codigoDeBarras) {
-        this.numeroDaNota = codigoDeBarras.substring(11, 20);
-        this.nunAletNota = codigoDeBarras.substring(22, 30);
-        this.cnpj = codigoDeBarras.substring(34, 47)+codigoDeBarras.substring(4, 5);
+        this.numeroDaNota = codigoDeBarras.substring(25, 34);
+        this.nunAletNota = codigoDeBarras.substring(35, 43);
+        this.cnpj = codigoDeBarras.substring(6, 20);
+this.serie =  codigoDeBarras.substring(22, 25);
     }
 
     public String getNumeroDaNota() {
@@ -35,6 +36,10 @@ public class Cabecalho {
 
     public String getNunAletNota() {
         return nunAletNota;
+    }
+
+    public String getSerie() {
+        return this.serie;
     }
 
     public String getStatus() {
